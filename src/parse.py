@@ -11,6 +11,7 @@ print(JSON_PATH)
 with open(JSON_PATH, 'rt', encoding='utf-8') as src:
     scheme = json.load(src)
 
+# Get lines info from scheme
 lines = {}
 for line_id in scheme['data']['lines']:
     lines[line_id['id']] = {
@@ -20,10 +21,43 @@ for line_id in scheme['data']['lines']:
         'color': line_id['color']
     }
 
+# Get stations info from scheme
 stations = {}
 for metro in scheme['data']['stations']:
     stations[metro['id']]={
         'id': metro['id'],
         'name': metro['name']['ru'],
+        'ordering': metro['ordering'],
+        'line_id': metro['lineId'],
+        'perspective': metro['perspective'],
+        'color': lines[metro['lineId']]['color'],
     }
+
+# Get transitions info from scheme
+transitions = {}
+for trans in scheme['data']['transitions']:
+    transitions[trans['id']] = {
+        'id': trans['id'],
+        'from_id': trans['stationFromId'],
+        'to_id': trans['stationToId'],
+        'perspective': trans['perspective'],
+        'bi': trans['bi'],
+        'length': trans['pathLength']
+    }
+
+# Get connections info from scheme
+connections = {}
+for con in scheme['data']['connections']:
+    connections[con['id']] = {
+        'id': con['id'],
+        'from_id': con['stationFromId'],
+        'to_id': con['stationToId'],
+        'length': con['pathLength'],
+        'perspective': con['perspective'],
+        'bi': con['bi'],
+    }
+
+# Graph's creation
+graph = {}
+
 print('END')
