@@ -20,8 +20,9 @@ DB_PATH = abspath(join(FILES_PATH, SQL_FILE_NAME))
 
 
 def get_station_name(id_st):
-    '''There might be several stations with the same name (for example 'Belorusskaya').
-    But for our graph we need only one certain na,e with this name. '''
+    '''There might be several stations with the same name 
+    (for example 'Belorusskaya' has id 44, 176 and 313).
+    But for our graph we need only one certain station with this name. '''
     try:
         st_text = stations[id_st]['name']
     except KeyError:
@@ -119,5 +120,99 @@ except FileNotFoundError:
 con = sqlite3.connect(DB_PATH)
 cur = con.cursor()
 
+create_request = '''
+CREATE TABLE graphs(
+    stn_id INTEGER PRIMARY KEY,
+    name TEXT
+);
+CREATE TABLE stn12_times(
+    stn12_id INTEGERER PRIMARY KEY,
+    stn1 INTEGER,
+    stn2 INTEGER,
+    time INTEGER
+);
+CREATE TABLE lines(
+    line_id INTEGERER PRIMARY KEY,
+    id INTEGER,
+    color TEXT,
+    name TEXT,
+    ordering INTEGER
+);
+CREATE TABLE stations(
+    stn_id INTEGERER PRIMARY KEY,
+    color TEXT,
+    id INTEGER,
+    name TEXT,
+    ordering INTEGER,
+    perspective INTEGER,
+    line_id INTEGER
+);
+'''
+try:
+    cur.executescript(create_request)
+except sqlite3.DatabaseError as err:
+    print(f'Something is wrong (1), {err}!')
+else: 
+    print(f'Databese "{DB_PATH}" successfully created!')
 
+try:
+    # Fill 'graphs' table
+    for x in graph:
+        sdata = x, graph[x]['name']
+        insert_request = 'INSERT INTO graphs (stn_id, name) VALUES (?, ?)'
+        cur.execute(insert_request, sdata)
+
+    # Fill 'stn12_times' table
+    for x1 in graph:
+        for x2 in graph[x1]:
+            try:
+                # We don't need 'name' field, which is in 'graph'. 
+                _ = int(x2)
+                sdata = x1, x2, graph[x1][x2]
+                insert_request = '''
+                    INSERT INTO stn12_times (stn1, stn2, time) 
+                    VALUES (?, ?, ?)
+                '''
+                cur.execute(insert_request, sdata)
+            except ValueError:
+                continue
+    
+    # Fill 'lines' table
+    for x in lines:
+        sdata = (
+            x,
+            lines[x]['id'],
+            lines[x]['color'],
+            lines[x]['name'],
+            lines[x]['ordering'],
+        )
+        insert_request = '''
+            INSERT INTO lines (line_id, id, color, name, ordering) 
+            VALUES (?, ?, ?, ?, ?)
+        '''
+        cur.execute(insert_request, sdata)
+    
+    # Fill 'stations' table
+    for x in stations:
+        sdata = (
+            x,
+            stations[x]['color'],
+            stations[x]['id'],
+            stations[x]['line_id'],
+            stations[x]['name'],
+            stations[x]['ordering'],
+            stations[x]['perspective'],
+        )
+        insert_request = '''
+            INSERT INTO stations (stn_id, color, id, line_id, name, ordering,
+            perspective) VALUES (?, ?, ?, ?, ?, ?, ?)
+        '''
+        cur.execute(insert_request, sdata)
+        
+except sqlite3.DatabaseError as err:
+    print(f'Something is wrong (2), {err}!')
+else:
+    con.commit()
+    print(f'All requests are successfully created!')
+con.close()
 print('END')
