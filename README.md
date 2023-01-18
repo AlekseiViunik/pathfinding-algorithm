@@ -3,7 +3,7 @@
 
 ```
 This programm looks for the shortest way between 2 Moscow subway stations. It consists of two parts:
-- First part (parse.py) parses json file and packs data to pickle file.
+- First part (parse.py) parses json file (included) and packs data to pickle file.
 - Second part (search.py) unpacks pickle file and use the data to find the shortest way. 
 
 Second part uses Dijkstra's algorithm to search. It also uses prettytable to show result in readable form without GUI.
