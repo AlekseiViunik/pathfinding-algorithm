@@ -90,6 +90,7 @@ def ask_station():
 
 # 'Translate time' block
 def show_time(time):
+    '''Gets time in seconds and trinslate it in form hh:mm:ss.'''
     hours = time // SEC_IN_HOUR
     minutes = (time % SEC_IN_HOUR) // SEC_IN_MIN
     seconds = time_x % SEC_IN_MIN
