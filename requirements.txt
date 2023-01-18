@@ -1,0 +1,6 @@
+flake8==6.0.0
+mccabe==0.7.0
+prettytable==3.6.0
+pycodestyle==2.10.0
+pyflakes==3.0.1
+wcwidth==0.2.6
