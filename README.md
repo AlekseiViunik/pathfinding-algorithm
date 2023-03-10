@@ -1,4 +1,4 @@
-# searching_pass
+# pathfinding-algorithm
 ![Python version](https://img.shields.io/badge/python-3.8-yellow)
 
 ```
